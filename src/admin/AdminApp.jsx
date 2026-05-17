@@ -92,9 +92,22 @@ const AdminApp = () => {
     // Load Testimonials
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews`);
-        const data = await res.json();
-        setTestimonials(data);
+        const token = localStorage.getItem('admin_token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setTestimonials(data);
+        } else {
+          console.error('Error fetching testimonials: Status', res.status);
+          const savedTests = localStorage.getItem('gym_testimonials');
+          if (savedTests) {
+            setTestimonials(JSON.parse(savedTests));
+          }
+        }
       } catch (error) {
         console.error('Error fetching testimonials:', error);
         const savedTests = localStorage.getItem('gym_testimonials');
@@ -160,26 +173,56 @@ const AdminApp = () => {
     return () => clearInterval(timer);
   }, [activeTab]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const creds = JSON.parse(localStorage.getItem('gym_admin_creds')) || { email: 'admin@ironcore.gym', password: 'admin123' };
-    
-    if (loginData.email === creds.email && loginData.password === creds.password) {
-      Swal.fire({
-        title: 'Welcome Back!',
-        text: 'You have logged in successfully.',
-        icon: 'success',
-        confirmButtonColor: '#f59e0b',
-        background: '#18181b',
-        color: '#fff'
-      }).then(() => {
-        setIsAuthenticated(true);
-        localStorage.setItem('admin_auth', 'true');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: loginData.email,
+          password: loginData.password
+        })
       });
-    } else {
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        Swal.fire({
+          title: 'Welcome Back!',
+          text: 'You have logged in successfully.',
+          icon: 'success',
+          confirmButtonColor: '#f59e0b',
+          background: '#18181b',
+          color: '#fff'
+        }).then(() => {
+          setIsAuthenticated(true);
+          localStorage.setItem('admin_auth', 'true');
+          localStorage.setItem('admin_token', data.token); // Save JWT token
+          if (data.name) {
+            setAdminProfile({
+              name: data.name,
+              email: data.email,
+              image: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=f59e0b&color=18181b`
+            });
+          }
+        });
+      } else {
+        Swal.fire({
+          title: 'Access Denied', 
+          text: data.message || 'Invalid credentials! Please try again.', 
+          icon: 'error',
+          confirmButtonColor: '#f59e0b',
+          background: '#18181b',
+          color: '#fff'
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       Swal.fire({
-        title: 'Access Denied', 
-        text: 'Invalid credentials! Please try again.', 
+        title: 'Error',
+        text: 'Something went wrong during login.',
         icon: 'error',
         confirmButtonColor: '#f59e0b',
         background: '#18181b',
@@ -264,13 +307,19 @@ const AdminApp = () => {
   // Testimonial Actions
   const handleApproveTestimonial = async (id) => {
     try {
+      const token = localStorage.getItem('admin_token');
       const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews/${id}/approve`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (res.ok) {
         const updated = testimonials.map(t => (t._id === id || t.id === id) ? { ...t, status: 'approved' } : t);
         setTestimonials(updated);
         Swal.fire('Approved!', 'Review has been approved.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to approve review. Status: ' + res.status, 'error');
       }
     } catch (error) {
       console.error('Error approving review:', error);
@@ -280,13 +329,19 @@ const AdminApp = () => {
 
   const handleRejectTestimonial = async (id) => {
     try {
+      const token = localStorage.getItem('admin_token');
       const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (res.ok) {
         const updated = testimonials.filter(t => (t._id !== id && t.id !== id));
         setTestimonials(updated);
         Swal.fire('Deleted!', 'Review has been removed.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to delete review. Status: ' + res.status, 'error');
       }
     } catch (error) {
       console.error('Error deleting review:', error);
