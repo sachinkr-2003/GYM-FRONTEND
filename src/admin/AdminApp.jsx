@@ -118,51 +118,75 @@ const AdminApp = () => {
     };
     fetchTestimonials();
     
-    // Load Plans
-    const savedPlans = localStorage.getItem('gym_plans');
-    if (savedPlans) {
-      setPlans(JSON.parse(savedPlans));
-    }
-
-    // Load Trainers
-    const savedTrainers = localStorage.getItem('gym_trainers');
-    if (savedTrainers) {
-      let parsedTrainers = JSON.parse(savedTrainers);
-      // Auto-fix John Doe image to a better portrait
-      let changed = false;
-      parsedTrainers = parsedTrainers.map(t => {
-        if (t.name === 'John Doe' && t.image.includes('1594381898411')) {
-          changed = true;
-          return { ...t, image: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800&auto=format&fit=crop' };
+    // Load Plans from Backend
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/plans`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) setPlans(data);
+          else {
+            const saved = localStorage.getItem('gym_plans');
+            if (saved) setPlans(JSON.parse(saved));
+          }
         }
-        return t;
-      });
-      if (changed) localStorage.setItem('gym_trainers', JSON.stringify(parsedTrainers));
-      setTrainers(parsedTrainers);
-    }
+      } catch (error) { console.error('Error fetching plans:', error); }
+    };
+    fetchPlans();
 
-    // Load Services
-    const savedServices = localStorage.getItem('gym_services');
-    if (savedServices) {
-      setServices(JSON.parse(savedServices));
-    } else {
-      const defaultServices = [
-        { id: '1', iconName: 'Dumbbell', title: 'Strength Training', desc: 'Build muscle and increase your strength with our premium free weights and resistance machines.' },
-        { id: '2', iconName: 'Activity', title: 'Cardio Fitness', desc: 'Improve your endurance and heart health in our fully equipped cardio zone.' },
-        { id: '3', iconName: 'Flame', title: 'HIIT Workouts', desc: 'Burn maximum calories in minimal time with our intense high-interval classes.' },
-        { id: '4', iconName: 'Heart', title: 'Yoga & Pilates', desc: 'Enhance flexibility, core strength, and mental wellbeing in our dedicated studios.' },
-        { id: '5', iconName: 'Zap', title: 'CrossFit', desc: 'Functional movements performed at high intensity to prepare you for any physical challenge.' },
-        { id: '6', iconName: 'Crosshair', title: 'Personal Training', desc: 'Get 1-on-1 coaching customized to your specific goals and body type.' }
-      ];
-      setServices(defaultServices);
-      localStorage.setItem('gym_services', JSON.stringify(defaultServices));
-    }
+    // Load Trainers from Backend
+    const fetchTrainers = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/trainers`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) setTrainers(data);
+          else {
+            const saved = localStorage.getItem('gym_trainers');
+            if (saved) setTrainers(JSON.parse(saved));
+          }
+        }
+      } catch (error) { console.error('Error fetching trainers:', error); }
+    };
+    fetchTrainers();
 
-    // Load Schedule
-    const savedSchedule = localStorage.getItem('gym_schedule');
-    if (savedSchedule) {
-      setScheduleData(JSON.parse(savedSchedule));
-    }
+    // Load Services from Backend
+    const fetchServices = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/services`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) setServices(data);
+          else {
+            const saved = localStorage.getItem('gym_services');
+            if (saved) setServices(JSON.parse(saved));
+          }
+        }
+      } catch (error) { console.error('Error fetching services:', error); }
+    };
+    fetchServices();
+
+    // Load Schedule from Backend
+    const fetchSchedule = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            const scheduleObj = {};
+            data.forEach(item => {
+              if (!scheduleObj[item.day]) scheduleObj[item.day] = [];
+              scheduleObj[item.day].push(item);
+            });
+            setScheduleData(scheduleObj);
+          } else {
+            const saved = localStorage.getItem('gym_schedule');
+            if (saved) setScheduleData(JSON.parse(saved));
+          }
+        }
+      } catch (error) { console.error('Error fetching schedule:', error); }
+    };
+    fetchSchedule();
 
     // Load Inquiries from Backend
     const fetchInquiries = async () => {
@@ -365,10 +389,27 @@ const AdminApp = () => {
     }
   };
 
-  const handleSavePlans = (e) => {
+  const handleSavePlans = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    localStorage.setItem('gym_plans', JSON.stringify(plans));
-    Swal.fire('Success', 'Pricing plan updated successfully! Changes are live.', 'success');
+    try {
+      const token = localStorage.getItem('admin_token');
+      for (const plan of plans) {
+        if (plan._id) {
+          await fetch(`${import.meta.env.VITE_API_URL}/admin/plans/${plan._id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(plan)
+          });
+        }
+      }
+      Swal.fire('Success', 'Pricing plan updated successfully! Changes are live.', 'success');
+    } catch (error) {
+      console.error('Error saving plans:', error);
+      Swal.fire('Error', 'Failed to save plans.', 'error');
+    }
   };
   
   const handlePlanChange = (index, field, value) => {
@@ -382,21 +423,37 @@ const AdminApp = () => {
     setShowPlanModal(true);
   };
 
-  const handleAddPlanSubmit = (e) => {
+  const handleAddPlanSubmit = async (e) => {
     e.preventDefault();
     const newPlan = {
-      id: Date.now().toString(),
       name: newPlanData.name || 'New Plan',
       price: newPlanData.price || '0',
       duration: newPlanData.duration || '/month',
       features: newPlanData.features ? newPlanData.features.split(',').map(f => f.trim()) : ['24/7 Gym Access', 'Locker Facility', 'Free WiFi'],
       recommended: newPlanData.recommended
     };
-    const updated = [...plans, newPlan];
-    setPlans(updated);
-    localStorage.setItem('gym_plans', JSON.stringify(updated));
-    setShowPlanModal(false);
-    Swal.fire('Added!', 'New plan has been created.', 'success');
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/plans`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newPlan)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPlans([...plans, data.data]);
+        setShowPlanModal(false);
+        Swal.fire('Added!', 'New plan has been created.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to add plan.', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding plan:', error);
+      Swal.fire('Error', 'Failed to add plan.', 'error');
+    }
   };
 
   const handleRemovePlan = (id) => {
@@ -408,12 +465,27 @@ const AdminApp = () => {
       confirmButtonColor: '#f59e0b',
       cancelButtonColor: '#3f3f46',
       confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updated = plans.filter(p => p.id !== id);
-        setPlans(updated);
-        localStorage.setItem('gym_plans', JSON.stringify(updated));
-        Swal.fire('Deleted!', 'Plan has been removed.', 'success');
+        try {
+          const token = localStorage.getItem('admin_token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/plans/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const updated = plans.filter(p => (p._id !== id && p.id !== id));
+            setPlans(updated);
+            Swal.fire('Deleted!', 'Plan has been removed.', 'success');
+          } else {
+            Swal.fire('Error', 'Failed to delete plan.', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting plan:', error);
+          Swal.fire('Error', 'Failed to delete plan.', 'error');
+        }
       }
     });
   };
@@ -430,29 +502,58 @@ const AdminApp = () => {
     setShowTrainerModal(true);
   };
 
-  const handleAddTrainerSubmit = (e) => {
+  const handleAddTrainerSubmit = async (e) => {
     e.preventDefault();
     
-    let updated;
-    if (editingTrainerId) {
-      updated = trainers.map(t => t.id === editingTrainerId ? { ...newTrainerData, id: t.id } : t);
-    } else {
-      const newTrainer = {
-        id: Date.now().toString(),
-        name: newTrainerData.name || 'New Coach',
-        specialty: newTrainerData.specialty || 'Specialty',
-        image: newTrainerData.image || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2560&auto=format&fit=crop',
-        desc: newTrainerData.desc || 'Short description about the trainer.'
-      };
-      updated = [...trainers, newTrainer];
-    }
+    const trainerData = {
+      name: newTrainerData.name || 'New Coach',
+      specialty: newTrainerData.specialty || 'Specialty',
+      image: newTrainerData.image || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2560&auto=format&fit=crop',
+      desc: newTrainerData.desc || 'Short description about the trainer.'
+    };
 
-    setTrainers(updated);
-    localStorage.setItem('gym_trainers', JSON.stringify(updated));
-    setShowTrainerModal(false);
-    setNewTrainerData({ name: '', specialty: '', desc: '', image: '' });
-    setEditingTrainerId(null);
-    Swal.fire('Saved!', editingTrainerId ? 'Trainer updated successfully.' : 'New trainer has been added successfully.', 'success');
+    try {
+      const token = localStorage.getItem('admin_token');
+      let res;
+      if (editingTrainerId) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/trainers/${editingTrainerId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(trainerData)
+        });
+      } else {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/trainers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(trainerData)
+        });
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        if (editingTrainerId) {
+          const updated = trainers.map(t => (t._id === editingTrainerId || t.id === editingTrainerId) ? data.data : t);
+          setTrainers(updated);
+        } else {
+          setTrainers([...trainers, data.data]);
+        }
+        setShowTrainerModal(false);
+        setNewTrainerData({ name: '', specialty: '', desc: '', image: '' });
+        setEditingTrainerId(null);
+        Swal.fire('Saved!', editingTrainerId ? 'Trainer updated successfully.' : 'New trainer has been added successfully.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to save trainer.', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving trainer:', error);
+      Swal.fire('Error', 'Failed to save trainer.', 'error');
+    }
   };
 
   const handleModalImageUpload = (event) => {
@@ -479,12 +580,27 @@ const AdminApp = () => {
       confirmButtonColor: '#f59e0b',
       cancelButtonColor: '#3f3f46',
       confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updated = trainers.filter(t => t.id !== id);
-        setTrainers(updated);
-        localStorage.setItem('gym_trainers', JSON.stringify(updated));
-        Swal.fire('Deleted!', 'Trainer has been removed.', 'success');
+        try {
+          const token = localStorage.getItem('admin_token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/trainers/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const updated = trainers.filter(t => (t._id !== id && t.id !== id));
+            setTrainers(updated);
+            Swal.fire('Deleted!', 'Trainer has been removed.', 'success');
+          } else {
+            Swal.fire('Error', 'Failed to delete trainer.', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting trainer:', error);
+          Swal.fire('Error', 'Failed to delete trainer.', 'error');
+        }
       }
     });
   };
@@ -501,27 +617,57 @@ const AdminApp = () => {
     setShowServiceModal(true);
   };
 
-  const handleAddServiceSubmit = (e) => {
+  const handleAddServiceSubmit = async (e) => {
     e.preventDefault();
-    let updated;
-    if (editingServiceId) {
-      updated = services.map(s => s.id === editingServiceId ? { ...newServiceData, id: s.id } : s);
-    } else {
-      const newService = {
-        id: Date.now().toString(),
-        iconName: newServiceData.iconName || 'Dumbbell',
-        title: newServiceData.title || 'New Service',
-        desc: newServiceData.desc || 'Service description here.'
-      };
-      updated = [...services, newService];
-    }
+    
+    const serviceData = {
+      iconName: newServiceData.iconName || 'Dumbbell',
+      title: newServiceData.title || 'New Service',
+      desc: newServiceData.desc || 'Service description here.'
+    };
 
-    setServices(updated);
-    localStorage.setItem('gym_services', JSON.stringify(updated));
-    setShowServiceModal(false);
-    setEditingServiceId(null);
-    setNewServiceData({ iconName: 'Dumbbell', title: '', desc: '' });
-    Swal.fire('Saved!', editingServiceId ? 'Service updated successfully.' : 'New service has been added successfully.', 'success');
+    try {
+      const token = localStorage.getItem('admin_token');
+      let res;
+      if (editingServiceId) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/services/${editingServiceId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(serviceData)
+        });
+      } else {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/services`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(serviceData)
+        });
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        if (editingServiceId) {
+          const updated = services.map(s => (s._id === editingServiceId || s.id === editingServiceId) ? data.data : s);
+          setServices(updated);
+        } else {
+          setServices([...services, data.data]);
+        }
+        setShowServiceModal(false);
+        setEditingServiceId(null);
+        setNewServiceData({ iconName: 'Dumbbell', title: '', desc: '' });
+        Swal.fire('Saved!', editingServiceId ? 'Service updated successfully.' : 'New service has been added successfully.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to save service.', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving service:', error);
+      Swal.fire('Error', 'Failed to save service.', 'error');
+    }
   };
 
   const handleRemoveService = (id) => {
@@ -533,12 +679,27 @@ const AdminApp = () => {
       confirmButtonColor: '#f59e0b',
       cancelButtonColor: '#3f3f46',
       confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updated = services.filter(s => s.id !== id);
-        setServices(updated);
-        localStorage.setItem('gym_services', JSON.stringify(updated));
-        Swal.fire('Deleted!', 'Service has been removed.', 'success');
+        try {
+          const token = localStorage.getItem('admin_token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/services/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const updated = services.filter(s => (s._id !== id && s.id !== id));
+            setServices(updated);
+            Swal.fire('Deleted!', 'Service has been removed.', 'success');
+          } else {
+            Swal.fire('Error', 'Failed to delete service.', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting service:', error);
+          Swal.fire('Error', 'Failed to delete service.', 'error');
+        }
       }
     });
   };
@@ -556,31 +717,63 @@ const AdminApp = () => {
     setShowScheduleModal(true);
   };
 
-  const handleAddScheduleSubmit = (e) => {
+  const handleAddScheduleSubmit = async (e) => {
     e.preventDefault();
-    const dayClasses = scheduleData[scheduleActiveDay] || [];
-    let updatedClasses;
     
-    if (editingClassId) {
-      updatedClasses = dayClasses.map(c => c.id === editingClassId ? { ...newClassData, id: c.id } : c);
-    } else {
-      const newClass = {
-        id: Date.now().toString(),
-        time: newClassData.time || '00:00 AM',
-        class: newClassData.class || 'New Class',
-        trainer: newClassData.trainer || 'Trainer',
-        type: newClassData.type || 'Intense'
-      };
-      updatedClasses = [...dayClasses, newClass];
-    }
+    const classData = {
+      day: scheduleActiveDay,
+      time: newClassData.time || '00:00 AM',
+      class: newClassData.class || 'New Class',
+      trainer: newClassData.trainer || 'Trainer',
+      type: newClassData.type || 'Intense'
+    };
 
-    const newScheduleData = { ...scheduleData, [scheduleActiveDay]: updatedClasses };
-    setScheduleData(newScheduleData);
-    localStorage.setItem('gym_schedule', JSON.stringify(newScheduleData));
-    setShowScheduleModal(false);
-    setEditingClassId(null);
-    setNewClassData({ time: '', class: '', trainer: '', type: 'Intense' });
-    Swal.fire('Saved!', editingClassId ? 'Class updated successfully.' : 'New class has been added successfully.', 'success');
+    try {
+      const token = localStorage.getItem('admin_token');
+      let res;
+      if (editingClassId) {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/schedule/${editingClassId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(classData)
+        });
+      } else {
+        res = await fetch(`${import.meta.env.VITE_API_URL}/admin/schedule`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(classData)
+        });
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        const dayClasses = scheduleData[scheduleActiveDay] || [];
+        let updatedClasses;
+        if (editingClassId) {
+          updatedClasses = dayClasses.map(c => (c._id === editingClassId || c.id === editingClassId) ? data.data : c);
+        } else {
+          updatedClasses = [...dayClasses, data.data];
+        }
+        const newScheduleData = { ...scheduleData, [scheduleActiveDay]: updatedClasses };
+        setScheduleData(newScheduleData);
+        
+        setShowScheduleModal(false);
+        setEditingClassId(null);
+        setNewClassData({ time: '', class: '', trainer: '', type: 'Intense' });
+        Swal.fire('Saved!', editingClassId ? 'Class updated successfully.' : 'New class has been added successfully.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to save class.', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving class:', error);
+      Swal.fire('Error', 'Failed to save class.', 'error');
+    }
   };
 
   const handleRemoveScheduleClass = (id) => {
@@ -592,14 +785,29 @@ const AdminApp = () => {
       confirmButtonColor: '#f59e0b',
       cancelButtonColor: '#3f3f46',
       confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const dayClasses = scheduleData[scheduleActiveDay] || [];
-        const updatedClasses = dayClasses.filter(c => c.id !== id);
-        const newScheduleData = { ...scheduleData, [scheduleActiveDay]: updatedClasses };
-        setScheduleData(newScheduleData);
-        localStorage.setItem('gym_schedule', JSON.stringify(newScheduleData));
-        Swal.fire('Deleted!', 'Class has been removed.', 'success');
+        try {
+          const token = localStorage.getItem('admin_token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/schedule/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const dayClasses = scheduleData[scheduleActiveDay] || [];
+            const updatedClasses = dayClasses.filter(c => (c._id !== id && c.id !== id));
+            const newScheduleData = { ...scheduleData, [scheduleActiveDay]: updatedClasses };
+            setScheduleData(newScheduleData);
+            Swal.fire('Deleted!', 'Class has been removed.', 'success');
+          } else {
+            Swal.fire('Error', 'Failed to delete class.', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting class:', error);
+          Swal.fire('Error', 'Failed to delete class.', 'error');
+        }
       }
     });
   };

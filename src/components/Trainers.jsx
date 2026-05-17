@@ -28,13 +28,25 @@ const Trainers = () => {
   const [trainers, setTrainers] = useState([]);
 
   useEffect(() => {
-    const savedTrainers = localStorage.getItem('gym_trainers');
-    if (savedTrainers) {
-      setTrainers(JSON.parse(savedTrainers));
-    } else {
-      localStorage.setItem('gym_trainers', JSON.stringify(defaultTrainers));
-      setTrainers(defaultTrainers);
-    }
+    const fetchTrainers = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/trainers`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            setTrainers(data);
+          } else {
+            setTrainers(defaultTrainers);
+          }
+        } else {
+          setTrainers(defaultTrainers);
+        }
+      } catch (error) {
+        console.error('Error fetching trainers:', error);
+        setTrainers(defaultTrainers);
+      }
+    };
+    fetchTrainers();
   }, []);
 
   return (

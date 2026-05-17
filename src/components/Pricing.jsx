@@ -49,13 +49,25 @@ const Pricing = () => {
   const [plans, setPlans] = useState([]);
 
   useEffect(() => {
-    const savedPlans = localStorage.getItem('gym_plans');
-    if (savedPlans) {
-      setPlans(JSON.parse(savedPlans));
-    } else {
-      localStorage.setItem('gym_plans', JSON.stringify(defaultPlans));
-      setPlans(defaultPlans);
-    }
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/plans`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            setPlans(data);
+          } else {
+            setPlans(defaultPlans);
+          }
+        } else {
+          setPlans(defaultPlans);
+        }
+      } catch (error) {
+        console.error('Error fetching plans:', error);
+        setPlans(defaultPlans);
+      }
+    };
+    fetchPlans();
   }, []);
 
   return (

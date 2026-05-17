@@ -42,13 +42,30 @@ const Schedule = () => {
   const [scheduleData, setScheduleData] = useState({});
 
   React.useEffect(() => {
-    const saved = localStorage.getItem('gym_schedule');
-    if (saved) {
-      setScheduleData(JSON.parse(saved));
-    } else {
-      setScheduleData(defaultScheduleData);
-      localStorage.setItem('gym_schedule', JSON.stringify(defaultScheduleData));
-    }
+    const fetchSchedule = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/schedule`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            const scheduleObj = {};
+            data.forEach(item => {
+              if (!scheduleObj[item.day]) scheduleObj[item.day] = [];
+              scheduleObj[item.day].push(item);
+            });
+            setScheduleData(scheduleObj);
+          } else {
+            setScheduleData(defaultScheduleData);
+          }
+        } else {
+          setScheduleData(defaultScheduleData);
+        }
+      } catch (error) {
+        console.error('Error fetching schedule:', error);
+        setScheduleData(defaultScheduleData);
+      }
+    };
+    fetchSchedule();
   }, []);
 
   return (

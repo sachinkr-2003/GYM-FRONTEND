@@ -23,13 +23,25 @@ const Services = () => {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('gym_services');
-    if (saved) {
-      setServices(JSON.parse(saved));
-    } else {
-      setServices(defaultServices);
-      localStorage.setItem('gym_services', JSON.stringify(defaultServices));
-    }
+    const fetchServices = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/services`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.length > 0) {
+            setServices(data);
+          } else {
+            setServices(defaultServices);
+          }
+        } else {
+          setServices(defaultServices);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+        setServices(defaultServices);
+      }
+    };
+    fetchServices();
   }, []);
 
   return (
