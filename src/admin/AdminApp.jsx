@@ -604,10 +604,24 @@ const AdminApp = () => {
     });
   };
 
-  const handleMarkInquiryRead = (id) => {
-    const updated = inquiries.map(i => i.id === id ? { ...i, status: 'read' } : i);
-    setInquiries(updated);
-    localStorage.setItem('gym_inquiries', JSON.stringify(updated));
+  const handleMarkInquiryRead = async (id) => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/contacts/${id}/read`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const updated = inquiries.map(i => (i._id === id || i.id === id) ? { ...i, status: 'read' } : i);
+        setInquiries(updated);
+      } else {
+        console.error('Failed to mark inquiry as read');
+      }
+    } catch (error) {
+      console.error('Error marking inquiry as read:', error);
+    }
   };
 
   const handleRemoveInquiry = (id) => {
@@ -963,7 +977,7 @@ const AdminApp = () => {
                     <div className="flex flex-row md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0">
                       {inquiry.status === 'unread' && (
                         <button 
-                          onClick={() => handleMarkInquiryRead(inquiry.id)}
+                          onClick={() => handleMarkInquiryRead(inquiry._id || inquiry.id)}
                           className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
                         >
                           <CheckCircle className="w-4 h-4" /> Mark Read
