@@ -34,7 +34,7 @@ const Trainers = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.length > 0) {
-            setTrainers(data);
+            setTrainers([...defaultTrainers, ...data]);
           } else {
             setTrainers(defaultTrainers);
           }
