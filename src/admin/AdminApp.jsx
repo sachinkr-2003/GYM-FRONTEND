@@ -193,7 +193,8 @@ const AdminApp = () => {
           title: 'Welcome Back!',
           text: 'You have logged in successfully.',
           icon: 'success',
-          confirmButtonColor: '#f59e0b',
+          timer: 2000,
+          showConfirmButton: false,
           background: '#18181b',
           color: '#fff'
         }).then(() => {

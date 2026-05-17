@@ -38,7 +38,8 @@ const Contact = () => {
           title: 'Message Sent!',
           text: 'Thank you for reaching out. Our team will contact you shortly.',
           icon: 'success',
-          confirmButtonColor: '#f59e0b',
+          timer: 2000,
+          showConfirmButton: false,
           background: '#18181b',
           color: '#fff'
         });
