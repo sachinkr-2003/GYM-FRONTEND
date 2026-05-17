@@ -37,7 +37,7 @@ const Testimonials = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/reviews');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`);
         const data = await res.json();
         setReviews(data);
       } catch (error) {
@@ -82,7 +82,7 @@ const Testimonials = () => {
     };
     
     try {
-      const res = await fetch('http://localhost:5000/api/reviews', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newReview)

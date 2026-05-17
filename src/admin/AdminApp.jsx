@@ -92,7 +92,7 @@ const AdminApp = () => {
     // Load Testimonials
     const fetchTestimonials = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/admin/reviews');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews`);
         const data = await res.json();
         setTestimonials(data);
       } catch (error) {
@@ -264,7 +264,7 @@ const AdminApp = () => {
   // Testimonial Actions
   const handleApproveTestimonial = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/reviews/${id}/approve`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews/${id}/approve`, {
         method: 'PUT'
       });
       if (res.ok) {
@@ -280,7 +280,7 @@ const AdminApp = () => {
 
   const handleRejectTestimonial = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/reviews/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/reviews/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) {
