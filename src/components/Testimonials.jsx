@@ -39,7 +39,11 @@ const Testimonials = () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`);
         const data = await res.json();
-        setReviews(data);
+        if (data.length > 0) {
+          setReviews([...defaultReviews, ...data]);
+        } else {
+          setReviews(defaultReviews);
+        }
       } catch (error) {
         console.error('Error fetching reviews:', error);
         const saved = localStorage.getItem('gym_testimonials');

@@ -497,7 +497,7 @@ const AdminApp = () => {
   };
 
   const openEditTrainerModal = (trainer) => {
-    setEditingTrainerId(trainer.id);
+    setEditingTrainerId(trainer._id || trainer.id);
     setNewTrainerData({ ...trainer });
     setShowTrainerModal(true);
   };
@@ -615,7 +615,7 @@ const AdminApp = () => {
   };
 
   const openEditServiceModal = (service) => {
-    setEditingServiceId(service.id);
+    setEditingServiceId(service._id || service.id);
     setNewServiceData({ ...service });
     setShowServiceModal(true);
   };
@@ -715,7 +715,7 @@ const AdminApp = () => {
   };
 
   const openEditScheduleModal = (classItem) => {
-    setEditingClassId(classItem.id);
+    setEditingClassId(classItem._id || classItem.id);
     setNewClassData({ ...classItem });
     setShowScheduleModal(true);
   };
@@ -1164,7 +1164,7 @@ const AdminApp = () => {
                 <div className="p-8 text-center border border-zinc-800 text-zinc-500">No messages found.</div>
               ) : (
                 inquiries.map(inquiry => (
-                  <div key={inquiry.id} className={`bg-zinc-900 border ${inquiry.status === 'unread' ? 'border-amber-500/50' : 'border-zinc-800'} p-6 flex flex-col md:flex-row gap-6 items-start`}>
+                  <div key={inquiry._id || inquiry.id} className={`bg-zinc-900 border ${inquiry.status === 'unread' ? 'border-amber-500/50' : 'border-zinc-800'} p-6 flex flex-col md:flex-row gap-6 items-start`}>
                     <div className="flex-1 w-full">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
@@ -1203,7 +1203,7 @@ const AdminApp = () => {
                         <Mail className="w-4 h-4" /> Reply
                       </a>
                       <button 
-                        onClick={() => handleRemoveInquiry(inquiry.id)}
+                        onClick={() => handleRemoveInquiry(inquiry._id || inquiry.id)}
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-red-500 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
                       >
                         <Trash2 className="w-4 h-4" /> Delete
@@ -1231,7 +1231,7 @@ const AdminApp = () => {
                 <div className="p-8 text-center border border-zinc-800 text-zinc-500">No reviews found.</div>
               ) : (
                 testimonials.map(review => (
-                  <div key={review.id} className={`bg-zinc-900 border ${review.status === 'pending' ? 'border-amber-500/50' : 'border-zinc-800'} p-4 flex flex-col md:flex-row gap-4 items-start md:items-center`}>
+                  <div key={review._id || review.id} className={`bg-zinc-900 border ${review.status === 'pending' ? 'border-amber-500/50' : 'border-zinc-800'} p-4 flex flex-col md:flex-row gap-4 items-start md:items-center`}>
                     <img src={review.image} alt={review.name} className="w-12 h-12 object-cover border border-zinc-700" />
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
@@ -1279,11 +1279,11 @@ const AdminApp = () => {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {plans.map((plan, index) => (
-                  <div key={plan.id} className={`bg-zinc-900 border ${plan.recommended ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'border-zinc-800'} p-6 flex flex-col relative`}>
+                  <div key={plan._id || plan.id} className={`bg-zinc-900 border ${plan.recommended ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'border-zinc-800'} p-6 flex flex-col relative`}>
                     {plan.recommended && <div className="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>}
                     
                     <button 
-                      onClick={() => handleRemovePlan(plan.id)}
+                      onClick={() => handleRemovePlan(plan._id || plan.id)}
                       className="absolute top-4 right-4 text-zinc-500 hover:text-red-500 transition-colors"
                       title="Delete Plan"
                     >
@@ -1341,7 +1341,7 @@ const AdminApp = () => {
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {trainers.map((trainer) => (
-                  <div key={trainer.id} className="bg-zinc-900 border border-zinc-800 p-0 flex flex-col overflow-hidden group relative">
+                  <div key={trainer._id || trainer.id} className="bg-zinc-900 border border-zinc-800 p-0 flex flex-col overflow-hidden group relative">
                     <div className="h-40 relative overflow-hidden">
                       <img src={trainer.image.startsWith('/uploads') ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${trainer.image}` : trainer.image} alt={trainer.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
@@ -1354,7 +1354,7 @@ const AdminApp = () => {
                         <button onClick={() => openEditTrainerModal(trainer)} className="flex-1 flex items-center justify-center gap-1 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-2 py-2 text-[11px] font-bold uppercase tracking-wider transition-colors">
                           <Edit2 className="w-3.5 h-3.5" /> Edit
                         </button>
-                        <button onClick={() => handleRemoveTrainer(trainer.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
+                        <button onClick={() => handleRemoveTrainer(trainer._id || trainer.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -1378,7 +1378,7 @@ const AdminApp = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-zinc-900 border border-zinc-800 p-6 flex flex-col relative group hover:border-amber-500/50 transition-colors">
+                <div key={service._id || service.id} className="bg-zinc-900 border border-zinc-800 p-6 flex flex-col relative group hover:border-amber-500/50 transition-colors">
                   <div className="bg-zinc-950 w-12 h-12 flex items-center justify-center mb-4 border border-zinc-800">
                     <Activity className="w-6 h-6 text-amber-500" />
                   </div>
@@ -1389,7 +1389,7 @@ const AdminApp = () => {
                     <button onClick={() => openEditServiceModal(service)} className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors">
                       <Edit2 className="w-3.5 h-3.5" /> Edit
                     </button>
-                    <button onClick={() => handleRemoveService(service.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
+                    <button onClick={() => handleRemoveService(service._id || service.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -1432,7 +1432,7 @@ const AdminApp = () => {
               ) : (
                 <div className="space-y-3">
                   {scheduleData[scheduleActiveDay].map((cls) => (
-                    <div key={cls.id} className="bg-zinc-950 border border-zinc-800 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:border-amber-500/50 transition-colors">
+                    <div key={cls._id || cls.id} className="bg-zinc-950 border border-zinc-800 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:border-amber-500/50 transition-colors">
                       <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
                         <div>
                           <p className="text-zinc-500 text-[10px] uppercase font-bold tracking-wider mb-1">Time</p>
@@ -1456,7 +1456,7 @@ const AdminApp = () => {
                         <button onClick={() => openEditScheduleModal(cls)} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors">
                           <Edit2 className="w-3.5 h-3.5" /> Edit
                         </button>
-                        <button onClick={() => handleRemoveScheduleClass(cls.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
+                        <button onClick={() => handleRemoveScheduleClass(cls._id || cls.id)} className="flex items-center justify-center bg-zinc-800 hover:bg-red-500 text-white px-3 py-2 transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
