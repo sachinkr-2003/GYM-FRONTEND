@@ -48,7 +48,7 @@ const Schedule = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.length > 0) {
-            const scheduleObj = {};
+            const scheduleObj = { ...defaultScheduleData };
             data.forEach(item => {
               if (!scheduleObj[item.day]) scheduleObj[item.day] = [];
               scheduleObj[item.day].push(item);

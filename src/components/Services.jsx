@@ -29,7 +29,7 @@ const Services = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.length > 0) {
-            setServices(data);
+            setServices([...defaultServices, ...data]);
           } else {
             setServices(defaultServices);
           }

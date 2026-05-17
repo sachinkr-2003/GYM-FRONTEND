@@ -55,7 +55,7 @@ const Pricing = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.length > 0) {
-            setPlans(data);
+            setPlans([...defaultPlans, ...data]);
           } else {
             setPlans(defaultPlans);
           }
