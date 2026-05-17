@@ -90,7 +90,7 @@ const Contact = () => {
               </div>
               <div>
                 <h4 className="text-white font-bold text-lg mb-2 uppercase tracking-wide">Location</h4>
-                <p className="text-zinc-400">123 Fitness Street, Gym City, GC 10020<br/>Open 24/7 for Elite Members</p>
+                <p className="text-zinc-400">AWADHPURI BHOPAL 462022<br/>Open 24/7 for Elite Members</p>
               </div>
             </div>
             
@@ -98,82 +98,85 @@ const Contact = () => {
               <div className="bg-zinc-900 p-8  border border-zinc-800 flex-1">
                 <div className="text-amber-500 mb-4"><Phone className="w-8 h-8" /></div>
                 <h4 className="text-white font-bold mb-2 uppercase">Phone</h4>
-                <p className="text-zinc-400">+1 (555) 123-4567</p>
+                <p className="text-zinc-400">7808866408</p>
               </div>
               <div className="bg-zinc-900 p-8  border border-zinc-800 flex-1">
                 <div className="text-amber-500 mb-4"><Mail className="w-8 h-8" /></div>
                 <h4 className="text-white font-bold mb-2 uppercase">Email</h4>
-                <p className="text-zinc-400">join@ironcore.gym</p>
+                <p className="text-zinc-400">DIVYA@INFO.IN</p>
               </div>
             </div>
 
             {/* Map Placeholder */}
-            <div className="h-64 w-full bg-zinc-900  border border-zinc-800 overflow-hidden relative group">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity"></div>
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-zinc-950/80 px-6 py-3  backdrop-blur-sm border border-zinc-800">
-                  <span className="text-white font-bold uppercase tracking-wider text-sm flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-amber-500" /> View on Maps
-                  </span>
-                </div>
-              </div>
+            <div className="h-64 w-full bg-zinc-900  border border-zinc-800 overflow-hidden relative">
+              <iframe 
+                src="https://maps.google.com/maps?q=Awadhpuri%20Bhopal%20462022&t=&z=14&ie=UTF8&iwloc=&output=embed"
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen="" 
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="grayscale opacity-70 hover:opacity-100 transition-opacity"
+                title="Gym Location"
+              ></iframe>
             </div>
           </div>
 
           {/* Contact Form */}
-          <div className="bg-zinc-900 p-10  border border-zinc-800">
-            <h4 className="text-2xl font-black text-white uppercase italic tracking-wide mb-8">Send a Message</h4>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-zinc-900 p-6  border border-zinc-800">
+            <h4 className="text-xl font-black text-white uppercase italic tracking-wide mb-4">Send a Message</h4>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">First Name *</label>
+                  <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">First Name *</label>
                   <input 
                     type="text" 
                     value={formData.firstName}
                     onChange={e => setFormData({...formData, firstName: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors" 
+                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors" 
                     placeholder="John" 
                   />
                 </div>
                 <div>
-                  <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">Last Name</label>
+                  <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">Last Name</label>
                   <input 
                     type="text" 
                     value={formData.lastName}
                     onChange={e => setFormData({...formData, lastName: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors" 
+                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors" 
                     placeholder="Doe" 
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">Email Address *</label>
+                  <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">Email Address *</label>
                   <input 
                     type="email" 
                     value={formData.email}
                     onChange={e => setFormData({...formData, email: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors" 
+                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors" 
                     placeholder="john@example.com" 
                   />
                 </div>
                 <div>
-                  <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">Phone Number</label>
+                  <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">Phone Number</label>
                   <input 
                     type="tel" 
                     value={formData.phone}
                     onChange={e => setFormData({...formData, phone: e.target.value})}
-                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors" 
+                    className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors" 
                     placeholder="1234567890" 
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">Subject</label>
+                <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">Subject</label>
                 <select 
                   value={formData.subject}
                   onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors appearance-none"
+                  className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors appearance-none"
                 >
                   <option>Membership Inquiry</option>
                   <option>Personal Training</option>
@@ -182,16 +185,16 @@ const Contact = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-zinc-400 font-medium mb-2 text-sm uppercase">Message *</label>
+                <label className="block text-zinc-400 font-medium mb-1 text-sm uppercase">Message *</label>
                 <textarea 
                   rows="4" 
                   value={formData.message}
                   onChange={e => setFormData({...formData, message: e.target.value})}
-                  className="w-full bg-zinc-950 border border-zinc-800  px-4 py-3 text-white focus:outline-none focus:border-amber-500 transition-colors" 
+                  className="w-full bg-zinc-950 border border-zinc-800  px-4 py-2 text-white focus:outline-none focus:border-amber-500 transition-colors" 
                   placeholder="How can we help you?"
                 ></textarea>
               </div>
-              <button type="submit" className="btn-liquid w-full bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold uppercase tracking-wide py-4  transition-all">
+              <button type="submit" className="btn-liquid w-full bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold uppercase tracking-wide py-3 mt-4 transition-all">
                 <span>Send Message</span>
               </button>
             </form>

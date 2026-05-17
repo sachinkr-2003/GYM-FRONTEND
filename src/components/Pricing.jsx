@@ -113,9 +113,9 @@ const Pricing = () => {
                 ))}
               </ul>
 
-              <button className={`btn-liquid w-full py-4  font-bold uppercase tracking-wide transition-all ${plan.recommended ? 'bg-amber-500 hover:bg-amber-600 text-zinc-950' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}>
+              <a href="#contact" className={`btn-liquid w-full py-4 font-bold uppercase tracking-wide transition-all inline-block text-center ${plan.recommended ? 'bg-amber-500 hover:bg-amber-600 text-zinc-950' : 'bg-zinc-800 hover:bg-zinc-700 text-white'}`}>
                 <span>Choose {plan.name}</span>
-              </button>
+              </a>
             </div>
           ))}
         </div>
