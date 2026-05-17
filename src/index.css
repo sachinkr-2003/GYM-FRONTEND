@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-white font-sans antialiased overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .btn-liquid {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-liquid::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 150%;
+    width: 150%;
+    aspect-ratio: 1 / 1;
+    background-color: #3b82f6; /* Solid Blue-500 */
+    border-radius: 40%;
+    transform: translateX(-50%) rotate(0deg);
+    transition: top 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s linear;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .btn-liquid:hover::after {
+    top: -30%;
+    transform: translateX(-50%) rotate(180deg);
+  }
+  
+  /* Ensure text and icons inside button stay above the liquid */
+  .btn-liquid > * {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Custom Scrollbar for Sidebar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #3f3f46; /* zinc-700 */
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #f59e0b; /* amber-500 */
+  }
+}
