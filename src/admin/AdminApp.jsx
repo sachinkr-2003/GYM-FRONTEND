@@ -505,12 +505,16 @@ const AdminApp = () => {
   const handleAddTrainerSubmit = async (e) => {
     e.preventDefault();
     
-    const trainerData = {
-      name: newTrainerData.name || 'New Coach',
-      specialty: newTrainerData.specialty || 'Specialty',
-      image: newTrainerData.image || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2560&auto=format&fit=crop',
-      desc: newTrainerData.desc || 'Short description about the trainer.'
-    };
+    const formData = new FormData();
+    formData.append('name', newTrainerData.name || 'New Coach');
+    formData.append('specialty', newTrainerData.specialty || 'Specialty');
+    formData.append('desc', newTrainerData.desc || 'Short description about the trainer.');
+    
+    if (newTrainerData.imageFile) {
+      formData.append('image', newTrainerData.imageFile);
+    } else {
+      formData.append('image', newTrainerData.image || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2560&auto=format&fit=crop');
+    }
 
     try {
       const token = localStorage.getItem('admin_token');
@@ -519,19 +523,17 @@ const AdminApp = () => {
         res = await fetch(`${import.meta.env.VITE_API_URL}/admin/trainers/${editingTrainerId}`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(trainerData)
+          body: formData
         });
       } else {
         res = await fetch(`${import.meta.env.VITE_API_URL}/admin/trainers`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(trainerData)
+          body: formData
         });
       }
 
@@ -563,9 +565,10 @@ const AdminApp = () => {
         Swal.fire('Warning', 'File is too large! Please upload an image smaller than 2MB.', 'warning');
         return;
       }
+      setNewTrainerData({...newTrainerData, imageFile: file});
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewTrainerData({...newTrainerData, image: reader.result});
+        setNewTrainerData(prev => ({...prev, image: reader.result}));
       };
       reader.readAsDataURL(file);
     }
@@ -1340,7 +1343,7 @@ const AdminApp = () => {
                 {trainers.map((trainer) => (
                   <div key={trainer.id} className="bg-zinc-900 border border-zinc-800 p-0 flex flex-col overflow-hidden group relative">
                     <div className="h-40 relative overflow-hidden">
-                      <img src={trainer.image} alt={trainer.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img src={trainer.image.startsWith('/uploads') ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${trainer.image}` : trainer.image} alt={trainer.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
                     </div>
                     <div className="p-4 relative -mt-8 flex-1 flex flex-col">

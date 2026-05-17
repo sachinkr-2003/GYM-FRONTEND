@@ -67,7 +67,7 @@ const Trainers = () => {
             <div key={index} className="bg-zinc-900  overflow-hidden border border-zinc-800 group">
               <div className="h-80 overflow-hidden relative">
                 <img 
-                  src={trainer.image} 
+                  src={trainer.image.startsWith('/uploads') ? `${import.meta.env.VITE_API_URL.replace('/api', '')}${trainer.image}` : trainer.image} 
                   alt={trainer.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
