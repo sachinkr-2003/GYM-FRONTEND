@@ -164,11 +164,26 @@ const AdminApp = () => {
       setScheduleData(JSON.parse(savedSchedule));
     }
 
-    // Load Inquiries
-    const savedInquiries = localStorage.getItem('gym_inquiries');
-    if (savedInquiries) {
-      setInquiries(JSON.parse(savedInquiries));
-    }
+    // Load Inquiries from Backend
+    const fetchInquiries = async () => {
+      try {
+        const token = localStorage.getItem('admin_token');
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/contacts`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setInquiries(data);
+        } else {
+          console.error('Error fetching inquiries: Status', res.status);
+        }
+      } catch (error) {
+        console.error('Error fetching inquiries:', error);
+      }
+    };
+    fetchInquiries();
     
     return () => clearInterval(timer);
   }, [activeTab]);
