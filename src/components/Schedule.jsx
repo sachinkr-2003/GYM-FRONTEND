@@ -120,9 +120,9 @@ const Schedule = () => {
                     </td>
                     <td className="p-6 text-zinc-400 font-medium hidden md:table-cell">{slot.trainer}</td>
                     <td className="p-6 text-right">
-                      <button className="btn-liquid bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-6 py-2  font-bold uppercase text-xs tracking-wider transition-colors">
+                      <a href="#contact" className="btn-liquid bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-6 py-2 font-bold uppercase text-xs tracking-wider transition-colors inline-block text-center">
                         <span>Book</span>
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 ))}
