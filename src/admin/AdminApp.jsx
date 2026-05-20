@@ -1184,8 +1184,8 @@ const AdminApp = () => {
                 <div className="p-8 text-center border border-zinc-800 text-zinc-500">No messages found.</div>
               ) : (
                 inquiries.map(inquiry => (
-                  <div key={inquiry._id || inquiry.id} className={`bg-zinc-900 border ${inquiry.status === 'unread' ? 'border-amber-500/50' : 'border-zinc-800'} p-6 flex flex-col md:flex-row gap-6 items-start`}>
-                    <div className="flex-1 w-full">
+                  <div key={inquiry._id || inquiry.id} className={`bg-zinc-900 border ${inquiry.status === 'unread' ? 'border-amber-500/50' : 'border-zinc-800'} p-6 flex flex-col gap-4`}>
+                    <div className="w-full">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
                           <h4 className="text-lg font-bold text-white uppercase">{inquiry.firstName} {inquiry.lastName}</h4>
@@ -1208,11 +1208,11 @@ const AdminApp = () => {
                       </div>
                     </div>
                     
-                    <div className="flex flex-wrap md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-row gap-3 w-full mt-2">
                       {inquiry.status === 'unread' && (
                         <button 
                           onClick={() => handleMarkInquiryRead(inquiry._id || inquiry.id)}
-                          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
+                          className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
                         >
                           <CheckCircle className="w-4 h-4" /> Mark Read
                         </button>
@@ -1221,7 +1221,7 @@ const AdminApp = () => {
                         <>
                           <a 
                             href={`tel:${inquiry.phone}`}
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
                           >
                             <Phone className="w-4 h-4" /> Call
                           </a>
@@ -1229,7 +1229,7 @@ const AdminApp = () => {
                             href={`https://wa.me/${inquiry.phone.replace(/[^0-9]/g, '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-green-600 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-green-600 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
                           >
                             <MessageSquare className="w-4 h-4" /> WhatsApp
                           </a>
@@ -1239,13 +1239,13 @@ const AdminApp = () => {
                         href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=Re: ${encodeURIComponent(inquiry.subject)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
                       >
                         <Mail className="w-4 h-4" /> Reply
                       </a>
                       <button 
                         onClick={() => handleRemoveInquiry(inquiry._id || inquiry.id)}
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-red-500 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 bg-zinc-800 hover:bg-red-500 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
                       >
                         <Trash2 className="w-4 h-4" /> Delete
                       </button>
