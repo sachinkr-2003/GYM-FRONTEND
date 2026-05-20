@@ -149,14 +149,16 @@ const Testimonials = () => {
             style={{ transform: `translateX(-${currentIndex * (isMobile ? 100 : 33.333)}%)` }}
           >
             {approvedReviews.map((review, index) => (
-              <div key={index} className="w-full md:w-1/3 flex-shrink-0 px-4">
-                <div className="bg-zinc-900 p-8 border border-zinc-800 relative mt-8">
+              <div key={index} className="w-full md:w-1/3 flex-shrink-0 px-4 flex flex-col">
+                <div className="bg-zinc-900 p-8 border border-zinc-800 relative mt-8 flex-1 flex flex-col justify-between">
                   <div className="absolute -top-6 left-8 bg-amber-500 w-12 h-12 flex items-center justify-center border-4 border-zinc-900">
                     <Quote className="w-5 h-5 text-zinc-950 fill-zinc-950" />
                   </div>
-                  <p className="text-zinc-300 mb-8 mt-4 italic leading-relaxed">
-                    "{review.content}"
-                  </p>
+                  <div className="flex-1 flex flex-col justify-center">
+                    <p className="text-zinc-300 mb-8 mt-4 italic leading-relaxed">
+                      "{review.content}"
+                    </p>
+                  </div>
                   <div className="flex items-center gap-4 border-t border-zinc-800 pt-6">
                     <img 
                       src={review.image} 
