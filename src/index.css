@@ -53,3 +53,16 @@
     background-color: #f59e0b; /* amber-500 */
   }
 }
+
+/* Force hand cursor on all interactive elements across site and admin panel */
+button,
+a,
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"],
+.btn-liquid,
+.cursor-pointer {
+  cursor: pointer !important;
+}

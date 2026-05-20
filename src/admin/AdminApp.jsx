@@ -22,13 +22,18 @@ import {
   Edit3,
   Settings,
   Menu,
-  User
+  User,
+  Phone
 } from 'lucide-react';
 
 const AdminApp = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('admin_active_tab') || 'dashboard');
+
+  useEffect(() => {
+    localStorage.setItem('admin_active_tab', activeTab);
+  }, [activeTab]);
   
   // Data States (Simulating Database with LocalStorage)
   const [testimonials, setTestimonials] = useState([]);
@@ -844,12 +849,27 @@ const AdminApp = () => {
       confirmButtonColor: '#f59e0b',
       cancelButtonColor: '#3f3f46',
       confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updated = inquiries.filter(i => i.id !== id);
-        setInquiries(updated);
-        localStorage.setItem('gym_inquiries', JSON.stringify(updated));
-        Swal.fire('Deleted!', 'Message has been removed.', 'success');
+        try {
+          const token = localStorage.getItem('admin_token');
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/admin/contacts/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const updated = inquiries.filter(i => i._id !== id && i.id !== id);
+            setInquiries(updated);
+            Swal.fire('Deleted!', 'Message has been removed.', 'success');
+          } else {
+            Swal.fire('Error', 'Failed to delete message from server.', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting message:', error);
+          Swal.fire('Error', 'Failed to delete message.', 'error');
+        }
       }
     });
   };
@@ -1178,14 +1198,17 @@ const AdminApp = () => {
                         <span className="text-zinc-500 text-xs font-medium">{inquiry.date}</span>
                       </div>
                       <p className="text-amber-500 text-sm font-bold uppercase tracking-wide mb-1">{inquiry.subject}</p>
-                      <p className="text-zinc-400 text-xs mb-4">{inquiry.email}</p>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4 text-xs text-zinc-400">
+                        <span>Email: {inquiry.email}</span>
+                        {inquiry.phone && <span>| Phone: {inquiry.phone}</span>}
+                      </div>
                       
                       <div className="bg-zinc-950 border border-zinc-800 p-4">
                         <p className="text-zinc-300 text-sm whitespace-pre-wrap">{inquiry.message}</p>
                       </div>
                     </div>
                     
-                    <div className="flex flex-row md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0">
+                    <div className="flex flex-wrap md:flex-col gap-3 w-full md:w-auto mt-4 md:mt-0">
                       {inquiry.status === 'unread' && (
                         <button 
                           onClick={() => handleMarkInquiryRead(inquiry._id || inquiry.id)}
@@ -1193,6 +1216,24 @@ const AdminApp = () => {
                         >
                           <CheckCircle className="w-4 h-4" /> Mark Read
                         </button>
+                      )}
+                      {inquiry.phone && (
+                        <>
+                          <a 
+                            href={`tel:${inquiry.phone}`}
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-amber-500 text-white hover:text-zinc-950 px-4 py-3 font-bold uppercase text-xs transition-colors"
+                          >
+                            <Phone className="w-4 h-4" /> Call
+                          </a>
+                          <a 
+                            href={`https://wa.me/${inquiry.phone.replace(/[^0-9]/g, '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-green-600 text-white hover:text-white px-4 py-3 font-bold uppercase text-xs transition-colors"
+                          >
+                            <MessageSquare className="w-4 h-4" /> WhatsApp
+                          </a>
+                        </>
                       )}
                       <a 
                         href={`https://mail.google.com/mail/?view=cm&fs=1&to=${inquiry.email}&su=Re: ${encodeURIComponent(inquiry.subject)}`}
